@@ -1,4 +1,4 @@
-VERSION = '0.1.14'
+VERSION = '0.2.0'
 
 DEFAULT_SWAGGER_SETTINGS = {
     'exclude_namespaces': [],
@@ -7,7 +7,8 @@ DEFAULT_SWAGGER_SETTINGS = {
     'api_key': '',
     'enabled_methods': ['get', 'post', 'put', 'patch', 'delete'],
     'is_authenticated': False,
-    'is_superuser': False
+    'is_superuser': False,
+    'permission_denied_handler': None,
 }
 
 try:
