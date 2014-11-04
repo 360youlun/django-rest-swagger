@@ -95,7 +95,25 @@ class SwaggerResourcesView(APIDocView):
 
     def get_resources(self):
         urlparser = UrlParser()
-        apis = urlparser.get_apis(exclude_namespaces=SWAGGER_SETTINGS.get('exclude_namespaces'))
+
+        user_groups = self.request.user.groups.all()
+        namespaces_by_group = SWAGGER_SETTINGS.get('exclude_namespaces_by_user_group', {})
+        in_group = False
+        excluded_namespaces = set()
+
+        if namespaces_by_group and user_groups:
+            for group in user_groups:
+                # override `exclude_namespaces` param if group is matched
+                if group.name in namespaces_by_group:
+                    # union namespaces
+                    excluded_namespaces |= set(namespaces_by_group[group.name])
+                    in_group = True
+
+        if not in_group:
+            # if user groups are not in setting then use default exclude_namespaces list
+            excluded_namespaces = SWAGGER_SETTINGS.get('exclude_namespaces', [])
+
+        apis = urlparser.get_apis(exclude_namespaces=list(excluded_namespaces))
         resources = urlparser.get_top_level_apis(apis)
 
         return resources
